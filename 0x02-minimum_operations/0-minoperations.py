@@ -21,6 +21,7 @@ def highestPrimeFactor(n):
 
     return int(max_prime)
 
+
 def isPrime(n):
     ''' checks whether number is prime or not '''
     flag = False
@@ -31,6 +32,7 @@ def isPrime(n):
                 flag = True
                 break
     return not flag
+
 
 def minOperations(n):
     ''' finds number of minimum of operations to get n number of H '''
