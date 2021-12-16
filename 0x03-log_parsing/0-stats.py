@@ -37,13 +37,14 @@ for line in sys.stdin:
     withoutDash = line.replace('-', '')
     arrayFromString = withoutDash.split(' ')
     try:
-        if arrayFromString[5] and isinstance(int(arrayFromString[5]), int):
-            statusCodeTracker[arrayFromString[5]] += 1
-        fileSizeTracker += int(arrayFromString[6])
+        statusCode = int(arrayFromString[6])
+        if arrayFromString[5] and isinstance(int(arrayFromString[6]), int):
+            statusCodeTracker[arrayFromString[6]] += 1
+        fileSizeTracker += int(arrayFromString[7])
         if lineCount == 10 or signal.signal(signal.SIGINT, handler):
             print('File size: {}'.format(fileSizeTracker))
             for key, value in statusCodeTracker.items():
-                if int(arrayFromString[5]) not in statusCodeTracker.keys():
+                if statusCode not in statusCodeTracker.keys():
                     continue
                 print('{}: {}'.format(key, value))
     except:
