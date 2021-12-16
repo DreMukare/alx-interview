@@ -47,5 +47,6 @@ for line in sys.stdin:
                 if statusCode not in statusCodeTracker.keys():
                     continue
                 print('{}: {}'.format(key, value))
+            lineCount = 0
     except:
         pass
