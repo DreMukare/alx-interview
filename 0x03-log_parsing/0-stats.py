@@ -1,51 +1,47 @@
 #!/usr/bin/python3
-'''reads stdin line by line and computes metrics'''
-import re
-import sys
-import signal
+""" script that reads stdin line by line and computes metrics """
 
+if __name__ == '__main__':
 
-toMatch = re.compile(
-                     r'^\d{1,3}\.\d{1,3}\.\d{1,3} \
-                     \.\d{1,3}\s\-\s\[[0-9]{4}\-[0-9] \
-                     {1,2}\-[0-9]{1,2}\s[0-9]{1,2}\: \
-                     [0-9]{1,2}\:[0-9]{1,2}.[0-9]{1,6}\] \
-                     \s\"GET\s\/projects\/260\sHTTP\/ \
-                     1\.1\"\s\d{3}\s\d{1,4}$')
-statusCodeTracker = {
-    '200': 0,
-    '301': 0,
-    '400': 0,
-    '401': 0,
-    '403': 0,
-    '404': 0,
-    '405': 0,
-    '500': 0
-}
-fileSizeTracker = 0
-lineCount = 0
+    import sys
 
+    def print_results(statusCodes, fileSize):
+        """ Print statistics """
+        print("File size: {:d}".format(fileSize))
+        for statusCode, times in sorted(statusCodes.items()):
+            if times:
+                print("{:s}: {:d}".format(statusCode, times))
 
-def handler():
-    return True
+    statusCodes = {"200": 0,
+                   "301": 0,
+                   "400": 0,
+                   "401": 0,
+                   "403": 0,
+                   "404": 0,
+                   "405": 0,
+                   "500": 0
+                   }
+    fileSize = 0
+    n_lines = 0
 
-
-for line in sys.stdin:
-    lineCount += 1
-    if toMatch.match(line) is False:
-        continue
-    withoutDash = line.replace('-', '')
-    arrayFromString = withoutDash.split(' ')
     try:
-        statusCode = int(arrayFromString[6])
-        if arrayFromString[5] and isinstance(int(arrayFromString[6]), int):
-            statusCodeTracker[arrayFromString[6]] += 1
-        fileSizeTracker += int(arrayFromString[7])
-        if lineCount == 10 or signal.signal(signal.SIGINT, handler):
-            print('File size: {}'.format(fileSizeTracker))
-            for key, value in statusCodeTracker.items():
-                if statusCode not in statusCodeTracker.keys():
-                    continue
-                print('{}: {}'.format(key, value))
-    except:
-        pass
+        """ Read stdin line by line """
+        for line in sys.stdin:
+            if n_lines != 0 and n_lines % 10 == 0:
+                """ After every 10 lines, print from the beginning """
+                print_results(statusCodes, fileSize)
+            n_lines += 1
+            data = line.split()
+            try:
+                """ Compute metrics """
+                statusCode = data[-2]
+                if statusCode in statusCodes:
+                    statusCodes[statusCode] += 1
+                fileSize += int(data[-1])
+            except:
+                pass
+        print_results(statusCodes, fileSize)
+    except KeyboardInterrupt:
+        """ Keyboard interruption, print from the beginning """
+        print_results(statusCodes, fileSize)
+        raise
