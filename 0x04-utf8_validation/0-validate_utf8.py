@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 '''determines if a given data set represents a valid utf-8 encoding'''
 
-def validateUTF8(data):
+def validUTF8(data):
     # number of bytes
     numberOfBytes = 0
 
