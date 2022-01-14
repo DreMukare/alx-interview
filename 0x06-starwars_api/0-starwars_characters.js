@@ -8,20 +8,18 @@ const url = `https://swapi-api.hbtn.io/api/films/${movieId}`;
 
 let charactersArray;
 
-request(url, (err, res, body) => {
+request(url, async (err, res, body) => {
   err && console.log(err);
 
   charactersArray = (JSON.parse(res.body).characters);
-  printNames(charactersArray);
+  for (const character of charactersArray) {
+    await new Promise((resolve, reject) => {
+      request(character, (err, res, body) => {
+        err && console.log(err);
+
+        console.log(JSON.parse(body).name);
+        resolve();
+      });
+    });
+  }
 });
-
-const printNames = (charactersArray, i = 0) => {
-  if (i === charactersArray.length) return;
-
-  request(charactersArray[i], (err, res, body) => {
-    err && console.log(err);
-
-    console.log(JSON.parse(body).name);
-    printNames(charactersArray, i + 1);
-  });
-};
